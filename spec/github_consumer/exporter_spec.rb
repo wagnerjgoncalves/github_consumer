@@ -1,9 +1,9 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe GithubConsumer::Exporter do
   describe '.save' do
     let(:dir) { "#{Dir.pwd}/spec/temp" }
-    let(:file_name) { "sample_file" }
+    let(:file_name) { 'sample_file' }
 
     subject { described_class.save(headers, body, file_name, dir) }
 
@@ -13,23 +13,28 @@ describe GithubConsumer::Exporter do
       let(:headers) { nil }
       let(:body) { [] }
 
-      it { expect(subject).to be false }
+      it { expect(subject[:status]).to be :error }
+      it { expect(subject[:message]).to eq 'Can not save report status file' }
     end
 
     describe 'without body' do
-      let(:headers) { %w[name email login avatar_url commits_count] }
+      let(:headers) { GithubConsumer::DEFAULT_FILE_HEADERS }
       let(:body) { nil }
 
-      it { expect(subject).to be false }
+      it { expect(subject[:status]).to be :error }
+      it { expect(subject[:message]).to eq 'Can not save report status file' }
     end
 
     describe 'with hearder and body' do
-      let(:headers) { %w[name email login avatar_url commits_count] }
+      let(:headers) { GithubConsumer::DEFAULT_FILE_HEADERS }
       let(:body) do
-        [['Jhon Doe', 'jhondoe@example.com', 'jhondoe', 'http://jhondoe.jpg', 10]]
+        [['Jhon', 'jhon@example.com', 'jhondoe', 'http://jhondoe.jpg', 10]]
       end
 
-      it { expect(subject).to be true }
+      it { expect(subject[:status]).to be :ok }
+      it do
+        expect(subject[:message]).to eq 'Report status file saved with success'
+      end
     end
   end
 end
